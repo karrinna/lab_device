@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <memory>
-#include "../main.cpp" // Подключаем твой код с ComplexColumn, Stream и Device
+#include "../device.cpp" // Подключаем твой код с ComplexColumn, Stream и Device
 
 // 1. Юнит-тест для Stream::setMassFlow и Stream::getMassFlow
 TEST(StreamTest, SetGetMassFlow) {
