@@ -1,3 +1,11 @@
+/**
+ * @file main.cpp
+ * @brief Реализация "Сложной колонны" с двумя входами и двумя выходами.
+ * 
+ * В этом файле реализованы классы Stream, Device и ComplexColumn, 
+ * а также простые тесты для проверки работы класса ComplexColumn.
+ */
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -6,44 +14,111 @@
 
 using namespace std;
 
+/// Допустимая погрешность для проверки значений потоков
 const float POSSIBLE_ERROR = 0.01;
 
+/**
+ * @class Stream
+ * @brief Класс, представляющий поток вещества.
+ * 
+ * Поток характеризуется именем и массовым расходом.
+ */
 class Stream {
-    double mass_flow;
-    string name;
+    double mass_flow; ///< Массовый расход потока
+    string name;      ///< Имя потока
 public:
+    /**
+     * @brief Конструктор потока
+     * @param n Имя потока
+     * @param flow Массовый расход (по умолчанию 0)
+     */
     Stream(const string &n, double flow = 0.0) : name(n), mass_flow(flow) {}
+
+    /**
+     * @brief Установить массовый расход
+     * @param m Новое значение массового расхода
+     */
     void setMassFlow(double m) { mass_flow = m; }
+
+    /**
+     * @brief Получить массовый расход
+     * @return Текущее значение массового расхода
+     */
     double getMassFlow() const { return mass_flow; }
+
+    /**
+     * @brief Получить имя потока
+     * @return Имя потока
+     */
     string getName() const { return name; }
+
+    /**
+     * @brief Вывести информацию о потоке в консоль
+     */
     void print() const { cout << "Stream " << name << " flow = " << mass_flow << endl; }
 };
 
+/**
+ * @class Device
+ * @brief Базовый класс устройства, обрабатывающего потоки.
+ * 
+ * Устройство имеет входные и выходные потоки и метод обновления выходов.
+ */
 class Device {
 protected:
-    vector<shared_ptr<Stream>> inputs;
-    vector<shared_ptr<Stream>> outputs;
-    int inputAmount = 0;
-    int outputAmount = 0;
+    vector<shared_ptr<Stream>> inputs;  ///< Входные потоки
+    vector<shared_ptr<Stream>> outputs; ///< Выходные потоки
+    int inputAmount = 0;  ///< Максимальное количество входов
+    int outputAmount = 0; ///< Максимальное количество выходов
 public:
     virtual ~Device() = default;
+
+    /**
+     * @brief Добавить входной поток
+     * @param s Умный указатель на поток
+     * @throw runtime_error если превышен лимит входов
+     */
     void addInput(shared_ptr<Stream> s) {
         if (inputs.size() >= inputAmount) throw runtime_error("INPUT STREAM LIMIT!");
         inputs.push_back(s);
     }
+
+    /**
+     * @brief Добавить выходной поток
+     * @param s Умный указатель на поток
+     * @throw runtime_error если превышен лимит выходов
+     */
     void addOutput(shared_ptr<Stream> s) {
         if (outputs.size() >= outputAmount) throw runtime_error("OUTPUT STREAM LIMIT!");
         outputs.push_back(s);
     }
+
+    /**
+     * @brief Виртуальный метод обновления выходных потоков
+     * 
+     * Реализуется в наследниках устройства.
+     */
     virtual void updateOutputs() = 0;
 };
 
+/**
+ * @class ComplexColumn
+ * @brief Сложная колонна с 2 входами и 2 выходами.
+ */
 class ComplexColumn : public Device {
 public:
+    /**
+     * @brief Конструктор колонны
+     */
     ComplexColumn() {
         inputAmount = 2;
         outputAmount = 2;
     }
+
+    /**
+     * @brief Распределяет суммарный поток входов поровну на выходы
+     * @throw runtime_error если потоки не полностью подключены
+     */
     void updateOutputs() override {
         if (inputs.size() != inputAmount || outputs.size() != outputAmount)
             throw runtime_error("Streams not fully connected!");
@@ -55,7 +130,9 @@ public:
     }
 };
 
-// Простые тесты
+/**
+ * @brief Простейшие тесты для проверки работы ComplexColumn
+ */
 void runTests() {
     // Тест 1: проверка распределения потоков
     auto s1 = make_shared<Stream>("s1", 10.0);
@@ -98,6 +175,9 @@ void runTests() {
         cout << "Test 4 failed\n";
 }
 
+/**
+ * @brief Главная функция программы
+ */
 int main() {
     auto s1 = make_shared<Stream>("s1", 10.0);
     auto s2 = make_shared<Stream>("s2", 5.0);
