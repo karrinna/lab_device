@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +21,9 @@ jobs:
     - name: Собрать GoogleTest
       run: |
         cd /usr/src/gtest
-        sudo cmake CMakeLists.txt
+        sudo cmake .
         sudo make
-        sudo cp *.a /usr/lib
+        sudo cp lib/*.a /usr/lib
 
     - name: Собрать проект и тесты
       run: |
