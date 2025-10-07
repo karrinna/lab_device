@@ -5,6 +5,7 @@
 
 #pragma once
 #include "Device.hpp"
+#include "Stream.hpp"
 #include <stdexcept>
 
 /**
