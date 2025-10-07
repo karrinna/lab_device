@@ -35,7 +35,7 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
+        token: 74c058b9-023b-4897-9087-88c6ce74189c
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
