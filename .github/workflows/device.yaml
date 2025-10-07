@@ -31,3 +31,8 @@ jobs:
 
     - name: Запустить тесты
       run: ./test_column
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        token: 74c058b9-023b-4897-9087-88c6ce74189c
