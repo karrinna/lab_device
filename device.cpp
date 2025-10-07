@@ -182,12 +182,9 @@ void runTests() {
         cout << "Тест 4 не пройден\n";
 }
 
-/**
- * @brief Главная функция программы
- */
+#ifndef UNIT_TEST
 int main() {
     setlocale(LC_ALL, "Russian");
-
     auto s1 = make_shared<Stream>("s1", 10.0);
     auto s2 = make_shared<Stream>("s2", 5.0);
     auto s3 = make_shared<Stream>("s3");
@@ -206,7 +203,10 @@ int main() {
     s3->print();
     s4->print();
 
+    cout << "\nЗапуск тестов...\n";
     runTests();
 
     return 0;
 }
+#endif
+
