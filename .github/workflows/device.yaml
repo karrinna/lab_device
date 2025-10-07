@@ -32,12 +32,6 @@ jobs:
     - name: Запустить тесты
       run: ./test_column
 
-        
-    - name: Generate coverage report
-      run: |
-        gcovr --root . --exclude-directories test --print-summary --xml -o coverage.xml
-        gcovr --root . --exclude-directories test --branches
-
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
