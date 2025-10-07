@@ -1,9 +1,10 @@
 /**
  * @file main.cpp
  * @brief Реализация "Сложной колонны" с двумя входами и двумя выходами.
- * 
- * В этом файле реализованы классы Stream, Device и ComplexColumn, 
- * а также простые тесты для проверки работы класса ComplexColumn.
+ *
+ * Файл содержит классы Stream, Device и ComplexColumn, а также встроенные
+ * тесты для проверки правильности работы колонны.
+ * Все сообщения в консоли на русском языке.
  */
 
 #include <iostream>
@@ -11,6 +12,7 @@
 #include <memory>
 #include <cmath>
 #include <stdexcept>
+#include <locale.h>
 
 using namespace std;
 
@@ -19,12 +21,12 @@ const float POSSIBLE_ERROR = 0.01;
 
 /**
  * @class Stream
- * @brief Класс, представляющий поток вещества.
- * 
+ * @brief Класс потока вещества
+ *
  * Поток характеризуется именем и массовым расходом.
  */
 class Stream {
-    double mass_flow; ///< Массовый расход потока
+    double mass_flow; ///< Массовый расход
     string name;      ///< Имя потока
 public:
     /**
@@ -32,17 +34,17 @@ public:
      * @param n Имя потока
      * @param flow Массовый расход (по умолчанию 0)
      */
-    Stream(const string &n, double flow = 0.0) : name(n), mass_flow(flow) {}
+    Stream(const string& n, double flow = 0.0) : name(n), mass_flow(flow) {}
 
     /**
      * @brief Установить массовый расход
-     * @param m Новое значение массового расхода
+     * @param m Новое значение расхода
      */
     void setMassFlow(double m) { mass_flow = m; }
 
     /**
      * @brief Получить массовый расход
-     * @return Текущее значение массового расхода
+     * @return Текущее значение расхода
      */
     double getMassFlow() const { return mass_flow; }
 
@@ -55,13 +57,13 @@ public:
     /**
      * @brief Вывести информацию о потоке в консоль
      */
-    void print() const { cout << "Stream " << name << " flow = " << mass_flow << endl; }
+    void print() const { cout << "Поток " << name << " расход = " << mass_flow << endl; }
 };
 
 /**
  * @class Device
- * @brief Базовый класс устройства, обрабатывающего потоки.
- * 
+ * @brief Базовый класс устройства
+ *
  * Устройство имеет входные и выходные потоки и метод обновления выходов.
  */
 class Device {
@@ -79,7 +81,7 @@ public:
      * @throw runtime_error если превышен лимит входов
      */
     void addInput(shared_ptr<Stream> s) {
-        if (inputs.size() >= inputAmount) throw runtime_error("INPUT STREAM LIMIT!");
+        if (inputs.size() >= inputAmount) throw runtime_error("ПРЕВЫШЕН ЛИМИТ ВХОДНЫХ ПОТОКОВ!");
         inputs.push_back(s);
     }
 
@@ -89,13 +91,13 @@ public:
      * @throw runtime_error если превышен лимит выходов
      */
     void addOutput(shared_ptr<Stream> s) {
-        if (outputs.size() >= outputAmount) throw runtime_error("OUTPUT STREAM LIMIT!");
+        if (outputs.size() >= outputAmount) throw runtime_error("ПРЕВЫШЕН ЛИМИТ ВЫХОДНЫХ ПОТОКОВ!");
         outputs.push_back(s);
     }
 
     /**
      * @brief Виртуальный метод обновления выходных потоков
-     * 
+     *
      * Реализуется в наследниках устройства.
      */
     virtual void updateOutputs() = 0;
@@ -103,7 +105,7 @@ public:
 
 /**
  * @class ComplexColumn
- * @brief Сложная колонна с 2 входами и 2 выходами.
+ * @brief Сложная колонна с 2 входами и 2 выходами
  */
 class ComplexColumn : public Device {
 public:
@@ -121,12 +123,12 @@ public:
      */
     void updateOutputs() override {
         if (inputs.size() != inputAmount || outputs.size() != outputAmount)
-            throw runtime_error("Streams not fully connected!");
+            throw runtime_error("ПОТОКИ НЕ ПОДКЛЮЧЕНЫ ПОЛНОСТЬЮ!");
 
         double total_flow = 0;
-        for (auto &s : inputs) total_flow += s->getMassFlow();
+        for (auto& s : inputs) total_flow += s->getMassFlow();
         double flow_per_output = total_flow / outputAmount;
-        for (auto &s : outputs) s->setMassFlow(flow_per_output);
+        for (auto& s : outputs) s->setMassFlow(flow_per_output);
     }
 };
 
@@ -134,7 +136,8 @@ public:
  * @brief Простейшие тесты для проверки работы ComplexColumn
  */
 void runTests() {
-    // Тест 1: проверка распределения потоков
+    cout << "\nЗапуск тестов...\n";
+
     auto s1 = make_shared<Stream>("s1", 10.0);
     auto s2 = make_shared<Stream>("s2", 6.0);
     auto s3 = make_shared<Stream>("s3");
@@ -145,40 +148,46 @@ void runTests() {
     col.addOutput(s3);
     col.addOutput(s4);
     col.updateOutputs();
+
+    // Тест 1: проверка распределения потоков
     if (abs(s3->getMassFlow() - 8.0) < POSSIBLE_ERROR &&
         abs(s4->getMassFlow() - 8.0) < POSSIBLE_ERROR)
-        cout << "Test 1 passed\n";
-    else cout << "Test 1 failed\n";
+        cout << "Тест 1 пройден\n";
+    else cout << "Тест 1 не пройден\n";
 
     // Тест 2: слишком много входов
     bool exceptionThrown = false;
     try {
         auto s5 = make_shared<Stream>("s5");
         col.addInput(s5);
-    } catch (runtime_error &e) { exceptionThrown = true; }
-    cout << "Test 2 " << (exceptionThrown ? "passed" : "failed") << endl;
+    }
+    catch (runtime_error& e) { exceptionThrown = true; }
+    cout << "Тест 2 " << (exceptionThrown ? "пройден" : "не пройден") << endl;
 
     // Тест 3: слишком много выходов
     exceptionThrown = false;
     try {
         auto s6 = make_shared<Stream>("s6");
         col.addOutput(s6);
-    } catch (runtime_error &e) { exceptionThrown = true; }
-    cout << "Test 3 " << (exceptionThrown ? "passed" : "failed") << endl;
+    }
+    catch (runtime_error& e) { exceptionThrown = true; }
+    cout << "Тест 3 " << (exceptionThrown ? "пройден" : "не пройден") << endl;
 
     // Тест 4: проверка суммы потоков
     double sum_inputs = s1->getMassFlow() + s2->getMassFlow();
     double sum_outputs = s3->getMassFlow() + s4->getMassFlow();
     if (abs(sum_inputs - sum_outputs) < POSSIBLE_ERROR)
-        cout << "Test 4 passed\n";
+        cout << "Тест 4 пройден\n";
     else
-        cout << "Test 4 failed\n";
+        cout << "Тест 4 не пройден\n";
 }
 
 /**
  * @brief Главная функция программы
  */
 int main() {
+    setlocale(LC_ALL, "Russian");
+
     auto s1 = make_shared<Stream>("s1", 10.0);
     auto s2 = make_shared<Stream>("s2", 5.0);
     auto s3 = make_shared<Stream>("s3");
@@ -197,7 +206,6 @@ int main() {
     s3->print();
     s4->print();
 
-    cout << "\nRunning tests...\n";
     runTests();
 
     return 0;
