@@ -24,10 +24,10 @@ jobs:
         sudo cmake .
         sudo make
         sudo cp lib/*.a /usr/lib
-
+        
     - name: Собрать проект и тесты
       run: |
-        g++ -std=c++17 -I/usr/include/gtest -pthread device.cpp tests/test_column.cpp -lgtest -lgtest_main -o test_column
+        g++ -std=c++17 -DUNIT_TEST -I/usr/include/gtest -pthread device.cpp tests/test_column.cpp -lgtest -lgtest_main -o test_column
 
     - name: Запустить тесты
       run: ./test_column
