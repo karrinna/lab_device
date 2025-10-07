@@ -39,3 +39,16 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+        
+    - name: Generate coverage report
+      run: |
+        gcovr --root . --exclude-directories test --print-summary --xml -o coverage.xml
+        gcovr --root . --exclude-directories test --branches
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
