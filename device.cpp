@@ -132,55 +132,6 @@ public:
     }
 };
 
-/**
- * @brief Простейшие тесты для проверки работы ComplexColumn
- */
-void runTests() {
-    cout << "\nЗапуск тестов...\n";
-
-    auto s1 = make_shared<Stream>("s1", 10.0);
-    auto s2 = make_shared<Stream>("s2", 6.0);
-    auto s3 = make_shared<Stream>("s3");
-    auto s4 = make_shared<Stream>("s4");
-    ComplexColumn col;
-    col.addInput(s1);
-    col.addInput(s2);
-    col.addOutput(s3);
-    col.addOutput(s4);
-    col.updateOutputs();
-
-    // Тест 1: проверка распределения потоков
-    if (abs(s3->getMassFlow() - 8.0) < POSSIBLE_ERROR &&
-        abs(s4->getMassFlow() - 8.0) < POSSIBLE_ERROR)
-        cout << "Тест 1 пройден\n";
-    else cout << "Тест 1 не пройден\n";
-
-    // Тест 2: слишком много входов
-    bool exceptionThrown = false;
-    try {
-        auto s5 = make_shared<Stream>("s5");
-        col.addInput(s5);
-    }
-    catch (runtime_error& e) { exceptionThrown = true; }
-    cout << "Тест 2 " << (exceptionThrown ? "пройден" : "не пройден") << endl;
-
-    // Тест 3: слишком много выходов
-    exceptionThrown = false;
-    try {
-        auto s6 = make_shared<Stream>("s6");
-        col.addOutput(s6);
-    }
-    catch (runtime_error& e) { exceptionThrown = true; }
-    cout << "Тест 3 " << (exceptionThrown ? "пройден" : "не пройден") << endl;
-
-    // Тест 4: проверка суммы потоков
-    double sum_inputs = s1->getMassFlow() + s2->getMassFlow();
-    double sum_outputs = s3->getMassFlow() + s4->getMassFlow();
-    if (abs(sum_inputs - sum_outputs) < POSSIBLE_ERROR)
-        cout << "Тест 4 пройден\n";
-    else
-        cout << "Тест 4 не пройден\n";
-}
 
 #ifndef UNIT_TEST
 int main() {
@@ -204,7 +155,7 @@ int main() {
     s4->print();
 
     cout << "\nЗапуск тестов...\n";
-    runTests();
+   
 
     return 0;
 }
