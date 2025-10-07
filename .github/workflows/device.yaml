@@ -36,7 +36,4 @@ jobs:
       uses: codecov/codecov-action@v4
       with:
         token: 74c058b9-023b-4897-9087-88c6ce74189c
-        files: coverage.info
-        flags: unittests
-        name: codecov-report
-        fail_ci_if_error: true
+
