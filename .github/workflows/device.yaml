@@ -16,24 +16,30 @@ jobs:
     - name: Установить зависимости
       run: |
         sudo apt-get update
-        sudo apt-get install -y g++ make libgtest-dev cmake
+        sudo apt-get install -y g++ make
 
-    - name: Собрать GoogleTest
+    - name: Собрать основную программу
+      run: make
+
+    - name: Собрать и запустить тесты
+      run: make test
+
+    - name: Проверить основную программу
       run: |
-        cd /usr/src/gtest
-        sudo cmake .
-        sudo make
-        sudo cp lib/*.a /usr/lib
-        
-    - name: Собрать проект и тесты
+        ./chemical_process | head -10
+        echo "Основная программа работает"
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Проверка качества кода
       run: |
-        g++ -std=c++17 -DUNIT_TEST -I/usr/include/gtest -pthread device.cpp tests/test_column.cpp -lgtest -lgtest_main -o test_column
-
-    - name: Запустить тесты
-      run: ./test_column
-
-    - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v5
-      with:
-        token: 74c058b9-023b-4897-9087-88c6ce74189c
-
+        # Проверяем, что нет файлов с расширением .o или исполняемых файлов в репозитории
+        if find . -name "*.o" -o -name "a.out" -o -name "chemical_process" -o -name "run_tests" | grep -q .; then
+          echo "Найденные файлы:"
+          find . -name "*.o" -o -name "a.out" -o -name "chemical_process" -o -name "run_tests"
+          echo "ОШИБКА: В репозитории не должно быть скомпилированных файлов!"
+          exit 1
+        fi
+        echo "Качество кода: OK - в репозитории нет скомпилированных файлов"
