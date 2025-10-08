@@ -12,18 +12,15 @@ const float POSSIBLE_ERROR = 0.01;
 
 // Класс потока вещества
 class Stream {
-    double mass_flow; ///< Массовый расход
     string name;      ///< Имя потока
+    double mass_flow; ///< Массовый расход
 public:
-
+    // Исправлен порядок инициализации - должен совпадать с порядком объявления полей
     Stream(const string& n, double flow = 0.0) : name(n), mass_flow(flow) {}
-
 
     void setMassFlow(double m) { mass_flow = m; }
 
-
     double getMassFlow() const { return mass_flow; }
-
 
     string getName() const { return name; }
 
@@ -36,8 +33,8 @@ class Device {
 protected:
     vector<shared_ptr<Stream>> inputs;  ///< Входные потоки
     vector<shared_ptr<Stream>> outputs; ///< Выходные потоки
-    int inputAmount = 0;  ///< Максимальное количество входов
-    int outputAmount = 0; ///< Максимальное количество выходов
+    size_t inputAmount = 0;  ///< Исправлено на size_t
+    size_t outputAmount = 0; ///< Исправлено на size_t
 public:
     virtual ~Device() = default;
 
@@ -59,7 +56,6 @@ public:
 // Сложная колонна с 2 входами и 2 выходами
 class ComplexColumn : public Device {
 public:
-
     ComplexColumn() {
         inputAmount = 2;
         outputAmount = 2;
@@ -78,7 +74,8 @@ public:
 };
 
 // Запуск тестов
-void runTests() {
+bool runTests() {
+    cout << "=== ЗАПУСК ТЕСТОВ ===" << endl;
     int passedTests = 0;
     int totalTests = 0;
 
@@ -90,10 +87,10 @@ void runTests() {
         s.setMassFlow(10.2);
         
         if (abs(s.getMassFlow() - 10.2) < POSSIBLE_ERROR && s.getName() == "test_stream") {
-            cout << "Пройден" << endl;
+            cout << "ПРОЙДЕН" << endl;
             passedTests++;
         } else {
-            cout << "Не пройден" << endl;
+            cout << "НЕ ПРОЙДЕН" << endl;
         }
     }
 
@@ -116,10 +113,10 @@ void runTests() {
         double expected = (10.0 + 20.0) / 2;
         if (abs(out1->getMassFlow() - expected) < POSSIBLE_ERROR && 
             abs(out2->getMassFlow() - expected) < POSSIBLE_ERROR) {
-            cout << "Пройден" << endl;
+            cout << "ПРОЙДЕН" << endl;
             passedTests++;
         } else {
-            cout << "Не пройден" << endl;
+            cout << "НЕ ПРОЙДЕН" << endl;
             cout << "Ожидалось: " << expected << endl;
             cout << "Получено out1: " << out1->getMassFlow() << endl;
             cout << "Получено out2: " << out2->getMassFlow() << endl;
@@ -144,10 +141,10 @@ void runTests() {
 
         if (abs(out1->getMassFlow() - 0.0) < POSSIBLE_ERROR && 
             abs(out2->getMassFlow() - 0.0) < POSSIBLE_ERROR) {
-            cout << "Пройден" << endl;
+            cout << "ПРОЙДЕН" << endl;
             passedTests++;
         } else {
-            cout << "Не пройден" << endl;
+            cout << "НЕ ПРОЙДЕН" << endl;
             cout << "Получено out1: " << out1->getMassFlow() << endl;
             cout << "Получено out2: " << out2->getMassFlow() << endl;
         }
@@ -167,13 +164,13 @@ void runTests() {
         
         try {
             col.addInput(in3);
-            cout << "Не пройден - Ожидалось исключение" << endl;
+            cout << "НЕ ПРОЙДЕН - Ожидалось исключение" << endl;
         } catch (const runtime_error& e) {
             if (string(e.what()) == "ПРЕВЫШЕН ЛИМИТ ВХОДНЫХ ПОТОКОВ!") {
-                cout << "Пройден" << endl;
+                cout << "ПРОЙДЕН" << endl;
                 passedTests++;
             } else {
-                cout << "Не пройден - Неверное сообщение: " << e.what() << endl;
+                cout << "НЕ ПРОЙДЕН - Неверное сообщение: " << e.what() << endl;
             }
         }
     }
@@ -192,13 +189,13 @@ void runTests() {
         
         try {
             col.addOutput(out3);
-            cout << "Не пройден - Ожидалось исключение" << endl;
+            cout << "НЕ ПРОЙДЕН - Ожидалось исключение" << endl;
         } catch (const runtime_error& e) {
             if (string(e.what()) == "ПРЕВЫШЕН ЛИМИТ ВЫХОДНЫХ ПОТОКОВ!") {
-                cout << "Пройден" << endl;
+                cout << "ПРОЙДЕН" << endl;
                 passedTests++;
             } else {
-                cout << "Не пройден - Неверное сообщение: " << e.what() << endl;
+                cout << "НЕ ПРОЙДЕН - Неверное сообщение: " << e.what() << endl;
             }
         }
     }
@@ -216,20 +213,22 @@ void runTests() {
 
         try {
             col.updateOutputs();
-            cout << "Не пройден - Ожидалось исключение" << endl;
+            cout << "НЕ ПРОЙДЕН - Ожидалось исключение" << endl;
         } catch (const runtime_error& e) {
             if (string(e.what()) == "ПОТОКИ НЕ ПОДКЛЮЧЕНЫ ПОЛНОСТЬЮ!") {
-                cout << "Пройден" << endl;
+                cout << "ПРОЙДЕН" << endl;
                 passedTests++;
             } else {
-                cout << "Не пройден - Неверное сообщение: " << e.what() << endl;
+                cout << "НЕ ПРОЙДЕН - Неверное сообщение: " << e.what() << endl;
             }
         }
     }
 
-    cout << "\n=== Результаты тестирования ===" << endl;
+    cout << "\n=== РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ ===" << endl;
     cout << "Пройдено тестов: " << passedTests << " из " << totalTests << endl;
     cout << "Успешность: " << (passedTests * 100.0 / totalTests) << "%" << endl;
+    
+    return passedTests == totalTests;
 }
 
 #ifndef UNIT_TEST
@@ -256,8 +255,15 @@ int main() {
     s4->print();
 
     cout << "\nЗапуск тестов...\n";
-    runTests();
-
-    return 0;
+    bool testsPassed = runTests();
+    
+    return testsPassed ? 0 : 1;
+}
+#else
+// Режим только для тестов (для CI)
+int main() {
+    setlocale(LC_ALL, "Russian");
+    bool testsPassed = runTests();
+    return testsPassed ? 0 : 1;
 }
 #endif
